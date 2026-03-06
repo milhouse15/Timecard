@@ -33,7 +33,7 @@ body{
   color:#fff;
   padding:16px 15px;
   font-weight:700;
-  font-size:18px;
+  font-size:20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -182,14 +182,19 @@ function addEntry(day){
     let inCell=document.createElement("td"); let outCell=document.createElement("td");
     if(d===day){
       let inInput=document.createElement("input"); inInput.type="tel"; inInput.inputMode="numeric"; inInput.pattern="[0-9]*";
-      inInput.dataset.r="dynamic"; inInput.dataset.d=d; inInput.addEventListener("change",()=>{save();calc();}); inInput.addEventListener("blur",()=>{autoFormat(inInput);});
+      inInput.dataset.r="dynamic"; inInput.dataset.d=d; 
+      inInput.addEventListener("change",()=>{save();calc();}); 
+      inInput.addEventListener("blur",()=>{autoFormat(inInput);});
       let outInput=document.createElement("input"); outInput.type="tel"; outInput.inputMode="numeric"; outInput.pattern="[0-9]*";
-      outInput.dataset.r="dynamic"; outInput.dataset.d=d; outInput.addEventListener("change",()=>{save();calc();}); outInput.addEventListener("blur",()=>{autoFormat(outInput);});
+      outInput.dataset.r="dynamic"; outInput.dataset.d=d; 
+      outInput.addEventListener("change",()=>{save();calc();}); 
+      outInput.addEventListener("blur",()=>{autoFormat(outInput);});
       inCell.appendChild(inInput); outCell.appendChild(outInput);
     }
     inRow.appendChild(inCell); outRow.appendChild(outCell);
   }
   tbody.appendChild(inRow); tbody.appendChild(outRow);
+  save(); // Save dynamic row immediately
 }
 
 // Auto-format input with AM/PM
@@ -251,14 +256,13 @@ function calc(){
 function clockAuto(){
   let day=(new Date().getDay()+6)%7; if(day>5) return;
   const inputs=document.querySelectorAll(`input[data-d="${day}"]`);
-  let placed=false;
   for(let i=0;i<inputs.length;i++){
     if(!inputs[i].value){
       if(i===inputs.length-1){ addEntry(day); }
       const now=new Date(); let minutes=Math.round((now.getHours()*60+now.getMinutes())/15)*15;
       let h=Math.floor(minutes/60), m=minutes%60; const ampm=h>=12?"PM":"AM";
       h=h%12; if(h===0) h=12; inputs[i].value=`${h}:${m<10?"0":""}${m} ${ampm}`;
-      placed=true; break;
+      break;
     }
   }
   save(); calc();
@@ -266,14 +270,65 @@ function clockAuto(){
 
 // Week storage
 function weekKey(){ let d=new Date(); d.setDate(d.getDate()-(d.getDay()+6)%7); d.setDate(d.getDate()+weekOffset*7); return "week_"+d.toISOString().slice(0,10); }
-function save(){ let data=[]; document.querySelectorAll("input").forEach(i=>data.push(i.value)); localStorage.setItem(weekKey(), JSON.stringify(data)); }
-function load(){ const data=JSON.parse(localStorage.getItem(weekKey())||"[]"); document.querySelectorAll("input").forEach((i,x)=>i.value=data[x]||""); updateWeekLabel(); calc(); }
 
-// Slide weeks
-function slideWeek(offset){ const wrapper=document.querySelector('.slide-wrapper'); wrapper.style.transform=`translateX(${offset}px)`; setTimeout(()=>{ wrapper.style.transition='none'; wrapper.style.transform='translateX(0)'; load(); wrapper.style.transition='transform 0.3s ease-in-out'; },300); }
-function nextWeek(){ slideWeek(-480); weekOffset++; } 
-function prevWeek(){ slideWeek(480); weekOffset--; }
-function updateWeekLabel(){ let d=new Date(); d.setDate(d.getDate()-(d.getDay()+6)%7); d.setDate(d.getDate()+weekOffset*7); document.getElementById("weekLabel").innerText=`Timecard: Week of ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; }
+// Save all inputs
+function save(){ 
+  const data = [];
+  document.querySelectorAll("input").forEach(i => data.push(i.value));
+  localStorage.setItem(weekKey(), JSON.stringify(data));
+}
+
+// Load all inputs (dynamic rows restored)
+function load(){ 
+  const saved = JSON.parse(localStorage.getItem(weekKey()) || "[]");
+  const body = document.getElementById("body");
+  body.innerHTML = ""; 
+
+  const numRows = Math.max(initialRows, Math.ceil(saved.length / days / 2));
+
+  for(let r = 0; r < numRows; r++){
+    let trIn = document.createElement("tr");
+    let trOut = document.createElement("tr");
+    let labelIn = document.createElement("td"); labelIn.innerText = "In"; trIn.appendChild(labelIn);
+    let labelOut = document.createElement("td"); labelOut.innerText = "Out"; trOut.appendChild(labelOut);
+
+    for(let d = 0; d < days; d++){
+      let inCell = document.createElement("td");
+      let outCell = document.createElement("td");
+
+      let inInput = document.createElement("input");
+      let outInput = document.createElement("input");
+      inInput.type = outInput.type = "tel";
+      inInput.inputMode = outInput.inputMode = "numeric";
+      inInput.pattern = outInput.pattern = "[0-9]*";
+      inInput.dataset.r = outInput.dataset.r = r;
+      inInput.dataset.d = outInput.dataset.d = d;
+
+      const idx = r*days*2 + d*2;
+      if(saved[idx] !== undefined) inInput.value = saved[idx];
+      if(saved[idx+1] !== undefined) outInput.value = saved[idx+1];
+
+      inInput.addEventListener("change",()=>{save();calc();});
+      inInput.addEventListener("blur",()=>{autoFormat(inInput);});
+      outInput.addEventListener("change",()=>{save();calc();});
+      outInput.addEventListener("blur",()=>{autoFormat(outInput);});
+
+      inCell.appendChild(inInput); outCell.appendChild(outInput);
+      trIn.appendChild(inCell); trOut.appendChild(outCell);
+    }
+    body.appendChild(trIn); body.appendChild(trOut);
+  }
+
+  updateWeekLabel();
+  calc();
+}
+
+// Update week label
+function updateWeekLabel(){
+  let d = new Date();
+  d.setDate(d.getDate()-(d.getDay()+6)%7 + weekOffset*7);
+  document.getElementById("weekLabel").innerText=`Timecard: Week of ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
 
 // CSV export
 function exportCSV(){
@@ -306,7 +361,28 @@ function exportCSV(){
 // Swipe detection
 let startX=null;
 document.addEventListener("touchstart", e=>startX=e.touches[0].clientX);
-document.addEventListener("touchend", e=>{ let dx=e.changedTouches[0].clientX-startX; if(dx>80) prevWeek(); if(dx<-80) nextWeek(); });
+document.addEventListener("touchend", e=>{
+  let dx=e.changedTouches[0].clientX-startX; 
+  if(dx>80) { weekOffset--; load(); }
+  if(dx<-80) { weekOffset++; load(); }
+});
+
+// Down arrow moves down column in ALL rows
+document.addEventListener("keydown", function(e){
+  if(e.key !== "ArrowDown") return;
+  const active = document.activeElement;
+  if(!active || active.tagName !== "INPUT") return;
+  e.preventDefault();
+  
+  const col = parseInt(active.dataset.d);
+  if(isNaN(col)) return;
+  
+  const allInputs = Array.from(document.querySelectorAll(`input[data-d="${col}"]`));
+  const index = allInputs.indexOf(active);
+  if(index >= 0 && index < allInputs.length-1){
+    allInputs[index+1].focus();
+  }
+});
 
 load();
 </script>
