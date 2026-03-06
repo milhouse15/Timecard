@@ -281,44 +281,10 @@ function save(){
 // Load all inputs (dynamic rows restored)
 function load(){ 
   const saved = JSON.parse(localStorage.getItem(weekKey()) || "[]");
-  const body = document.getElementById("body");
-  body.innerHTML = ""; 
-
-  const numRows = Math.max(initialRows, Math.ceil(saved.length / days / 2));
-
-  for(let r = 0; r < numRows; r++){
-    let trIn = document.createElement("tr");
-    let trOut = document.createElement("tr");
-    let labelIn = document.createElement("td"); labelIn.innerText = "In"; trIn.appendChild(labelIn);
-    let labelOut = document.createElement("td"); labelOut.innerText = "Out"; trOut.appendChild(labelOut);
-
-    for(let d = 0; d < days; d++){
-      let inCell = document.createElement("td");
-      let outCell = document.createElement("td");
-
-      let inInput = document.createElement("input");
-      let outInput = document.createElement("input");
-      inInput.type = outInput.type = "tel";
-      inInput.inputMode = outInput.inputMode = "numeric";
-      inInput.pattern = outInput.pattern = "[0-9]*";
-      inInput.dataset.r = outInput.dataset.r = r;
-      inInput.dataset.d = outInput.dataset.d = d;
-
-      const idx = r*days*2 + d*2;
-      if(saved[idx] !== undefined) inInput.value = saved[idx];
-      if(saved[idx+1] !== undefined) outInput.value = saved[idx+1];
-
-      inInput.addEventListener("change",()=>{save();calc();});
-      inInput.addEventListener("blur",()=>{autoFormat(inInput);});
-      outInput.addEventListener("change",()=>{save();calc();});
-      outInput.addEventListener("blur",()=>{autoFormat(outInput);});
-
-      inCell.appendChild(inInput); outCell.appendChild(outInput);
-      trIn.appendChild(inCell); trOut.appendChild(outCell);
-    }
-    body.appendChild(trIn); body.appendChild(trOut);
-  }
-
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach((input, idx) => {
+    if(saved[idx] !== undefined) input.value = saved[idx];
+  });
   updateWeekLabel();
   calc();
 }
@@ -367,20 +333,18 @@ document.addEventListener("touchend", e=>{
   if(dx<-80) { weekOffset++; load(); }
 });
 
-// Down arrow moves down column in ALL rows
+// Down arrow moves down column in all inputs
 document.addEventListener("keydown", function(e){
   if(e.key !== "ArrowDown") return;
   const active = document.activeElement;
   if(!active || active.tagName !== "INPUT") return;
   e.preventDefault();
   
-  const col = parseInt(active.dataset.d);
-  if(isNaN(col)) return;
-  
-  const allInputs = Array.from(document.querySelectorAll(`input[data-d="${col}"]`));
-  const index = allInputs.indexOf(active);
-  if(index >= 0 && index < allInputs.length-1){
-    allInputs[index+1].focus();
+  const col = active.dataset.d;
+  const allColInputs = Array.from(document.querySelectorAll(`input[data-d="${col}"]`));
+  const index = allColInputs.indexOf(active);
+  if(index >= 0 && index < allColInputs.length-1){
+    allColInputs[index+1].focus();
   }
 });
 
