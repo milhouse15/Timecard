@@ -5,8 +5,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Timecard Pro+</title>
-<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <style>
 body{
   font-family:-apple-system,BlinkMacSystemFont;
@@ -21,7 +21,7 @@ body{
   width:95%;
   background:#fdfaf0;
   border-radius:16px;
-  border: 2px solid #fff;
+  border:2px solid #fff;
   box-shadow:0 6px 18px rgba(0,0,0,.4);
   display:flex;
   flex-direction:column;
@@ -32,47 +32,64 @@ body{
 .top-bar{
   background:#000;
   color:#fff;
-  padding:16px 15px;
+  padding:12px 15px;
   font-weight:700;
-  font-size:20px;
+  font-size:16px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
 }
+.top-bar-left{ display:flex; flex-direction:column; gap:2px; }
+#weekLabel{ font-size:13px; font-weight:600; }
+#saveStatus{ font-size:10px; color:#888; font-weight:400; }
+.top-bar-right{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.top-bar button{
+  background:#333;
+  color:#fff;
+  border:1px solid #555;
+  border-radius:6px;
+  padding:5px 10px;
+  font-size:12px;
+  cursor:pointer;
+  -webkit-appearance:none;
+}
+.top-bar button:active{ background:#555; }
 .container{
-  padding:10px 15px;
+  padding:10px 12px;
   overflow-x:auto;
 }
-.slide-wrapper { transition: transform 0.3s ease-in-out; }
 table{
   width:100%;
   border-collapse:collapse;
   background:#fdfaf0;
-  border-radius:12px;
   table-layout:fixed;
 }
 th,td{
   border:1px solid #ddd;
-  padding:6px;
+  padding:4px 2px;
   text-align:center;
   color:#111;
 }
-th{ background:#f5f0e6; font-weight:600; }
+th{ background:#f5f0e6; font-weight:600; font-size:12px; }
+td:first-child{ font-size:11px; color:#555; width:28px; }
 input{
   border:none;
-  width:80%;
+  width:92%;
   text-align:center;
-  font-size:16px;
+  font-size:14px;
   background:#fff9eb;
-  border-radius:6px;
-  padding:4px 2px;
+  border-radius:5px;
+  padding:4px 1px;
   color:#111;
+  -webkit-appearance:none;
 }
-input:focus{ background:#fff7d9; outline:none; }
-.total{ font-weight:600; background:#f5f0e6; }
-.weekTotal{ font-weight:700; font-size:20px; }
-.bar{ height:6px; background:#007aff; border-radius:4px; margin-top:3px; width:100%; }
-.bottom-buttons{ padding:12px 15px; }
+input:focus{ background:#fff7d9; outline:2px solid #007aff; border-radius:5px; }
+.total{ font-weight:600; background:#f5f0e6; font-size:12px; }
+.weekTotal{ font-weight:700; font-size:17px; }
+.bar{ height:4px; background:#007aff; border-radius:3px; margin-top:2px; }
+.bottom-buttons{ padding:10px 15px 15px; display:flex; flex-direction:column; gap:8px; }
 button.clock{
   background:#34c759;
   color:white;
@@ -81,14 +98,19 @@ button.clock{
   width:100%;
   padding:12px;
   border:none;
+  font-weight:600;
+  -webkit-appearance:none;
 }
+button.clock:active{ background:#28a745; }
 button.addEntry{
   background:#007aff;
   color:white;
   border:none;
-  border-radius:6px;
-  padding:2px 6px;
-  font-size:14px;
+  border-radius:5px;
+  padding:3px 7px;
+  font-size:13px;
+  cursor:pointer;
+  -webkit-appearance:none;
 }
 .weekTotalRow td{
   font-weight:700;
@@ -99,50 +121,54 @@ button.addEntry{
 </style>
 </head>
 <body>
-
 <div class="app-frame">
 
   <div class="top-bar">
-    <div id="weekLabel">Timecard: Week of --/--/----</div>
-    <button onclick="exportCSV()">Export CSV</button>
+    <div class="top-bar-left">
+      <div id="weekLabel">Timecard</div>
+      <div id="saveStatus">—</div>
+    </div>
+    <div class="top-bar-right">
+      <button onclick="changeWeek(-1)">&#8592; Prev</button>
+      <button onclick="changeWeek(1)">Next &#8594;</button>
+      <button onclick="exportCSV()">Export CSV</button>
+    </div>
   </div>
 
   <div class="container">
-    <div class="slide-wrapper">
-      <table id="table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-          </tr>
-        </thead>
-        <tbody id="body"></tbody>
-        <tfoot>
-          <tr>
-            <td></td>
-            <td><button class="addEntry" onclick="addEntry(0)">+</button></td>
-            <td><button class="addEntry" onclick="addEntry(1)">+</button></td>
-            <td><button class="addEntry" onclick="addEntry(2)">+</button></td>
-            <td><button class="addEntry" onclick="addEntry(3)">+</button></td>
-            <td><button class="addEntry" onclick="addEntry(4)">+</button></td>
-            <td><button class="addEntry" onclick="addEntry(5)">+</button></td>
-          </tr>
-          <tr>
-            <td>Total</td>
-            <td class="total" id="t0"></td>
-            <td class="total" id="t1"></td>
-            <td class="total" id="t2"></td>
-            <td class="total" id="t3"></td>
-            <td class="total" id="t4"></td>
-            <td class="total" id="t5"></td>
-          </tr>
-          <tr class="weekTotalRow">
-            <td colspan="5" style="text-align:left; padding-left:8px;">Week Total</td>
-            <td colspan="2" style="text-align:right; padding-right:8px;" class="weekTotal" id="weekTotal"></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+    <table id="table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+        </tr>
+      </thead>
+      <tbody id="body"></tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          <td><button class="addEntry" onclick="addEntry(0)">+</button></td>
+          <td><button class="addEntry" onclick="addEntry(1)">+</button></td>
+          <td><button class="addEntry" onclick="addEntry(2)">+</button></td>
+          <td><button class="addEntry" onclick="addEntry(3)">+</button></td>
+          <td><button class="addEntry" onclick="addEntry(4)">+</button></td>
+          <td><button class="addEntry" onclick="addEntry(5)">+</button></td>
+        </tr>
+        <tr>
+          <td>Total</td>
+          <td class="total" id="t0"></td>
+          <td class="total" id="t1"></td>
+          <td class="total" id="t2"></td>
+          <td class="total" id="t3"></td>
+          <td class="total" id="t4"></td>
+          <td class="total" id="t5"></td>
+        </tr>
+        <tr class="weekTotalRow">
+          <td colspan="5" style="text-align:left;padding-left:8px;">Week Total</td>
+          <td colspan="2" style="text-align:right;padding-right:8px;" class="weekTotal" id="weekTotal"></td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
 
   <div class="bottom-buttons">
@@ -150,270 +176,328 @@ button.addEntry{
   </div>
 
 </div>
-
 <script>
-const days=6;
-let weekOffset=0, initialRows=6;
+var days = 6;
+var weekOffset = 0;
+var initialRows = 6;
+var dynamicCounts = {};
+var ALL_DATA_KEY = 'timecard_alldata_v1';
 
-// Track how many extra entry pairs have been added per day
-// dynamicCounts[weekKey][day] = number of extra in/out pairs
-let dynamicCounts = {};
+// ── Dual storage: localStorage + URL hash backup ───────────────────────────
+
+function saveAllData(allData) {
+try { localStorage.setItem(ALL_DATA_KEY, JSON.stringify(allData)); } catch(e) {}
+try {
+var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(allData))));
+history.replaceState(null, ‘’, ‘#’ + encoded);
+} catch(e) {}
+showSaveStatus();
+}
+
+function loadAllData() {
+var allData = null;
+try {
+var raw = localStorage.getItem(ALL_DATA_KEY);
+if (raw) allData = JSON.parse(raw);
+} catch(e) {}
+if (!allData && window.location.hash && window.location.hash.length > 1) {
+try {
+var decoded = decodeURIComponent(escape(atob(window.location.hash.slice(1))));
+allData = JSON.parse(decoded);
+try { localStorage.setItem(ALL_DATA_KEY, JSON.stringify(allData)); } catch(e) {}
+} catch(e) {}
+}
+return allData || {};
+}
+
+function showSaveStatus() {
+var el = document.getElementById(‘saveStatus’);
+var now = new Date();
+var h = now.getHours(), m = now.getMinutes();
+var ap = h >= 12 ? ‘PM’ : ‘AM’;
+h = h % 12; if (h === 0) h = 12;
+el.textContent = ’Saved ’ + h + ‘:’ + (m < 10 ? ‘0’ : ‘’) + m + ’ ’ + ap;
+}
+
+// ── Week key ───────────────────────────────────────────────────────────────
+
+function weekKey() {
+var d = new Date();
+d.setDate(d.getDate() - (d.getDay() + 6) % 7 + weekOffset * 7);
+return ‘week_’ + d.toISOString().slice(0, 10);
+}
+
+// ── Input factory ──────────────────────────────────────────────────────────
+
+function makeInput(r, d) {
+var input = document.createElement(‘input’);
+input.type = ‘text’;
+input.inputMode = ‘numeric’;
+input.pattern = ‘[0-9]*’;
+input.enterKeyHint = ‘next’;
+input.autocomplete = ‘off’;
+input.autocorrect = ‘off’;
+input.autocapitalize = ‘off’;
+input.dataset.r = String(r);
+input.dataset.d = String(d);
+input.addEventListener(‘change’, function() { saveCurrentWeek(); calc(); });
+input.addEventListener(‘blur’, function() { autoFormat(input); });
+input.addEventListener(‘keydown’, function(e) {
+if (e.keyCode === 13 || e.key === ‘Enter’) {
+e.preventDefault();
+moveDown(input);
+}
+});
+return input;
+}
+
+function moveDown(input) {
+var col = input.dataset.d;
+var allColInputs = Array.from(document.querySelectorAll(‘input[data-d=”’ + col + ‘”]’));
+var index = allColInputs.indexOf(input);
+if (index >= 0 && index < allColInputs.length - 1) {
+allColInputs[index + 1].focus();
+} else {
+input.blur();
+}
+}
+
+// ── Build table ────────────────────────────────────────────────────────────
+
+function buildTable() {
+var body = document.getElementById(‘body’);
+body.innerHTML = ‘’;
+for (var r = 0; r < initialRows; r++) {
+var tr = document.createElement(‘tr’);
+var label = document.createElement(‘td’);
+label.innerText = r % 2 === 0 ? ‘In’ : ‘Out’;
+tr.appendChild(label);
+for (var d = 0; d < days; d++) {
+var td = document.createElement(‘td’);
+td.appendChild(makeInput(r, d));
+tr.appendChild(td);
+}
+body.appendChild(tr);
+}
+}
+
+// ── Dynamic rows ───────────────────────────────────────────────────────────
 
 function getDynamicCounts() {
-  const key = weekKey();
-  if (!dynamicCounts[key]) dynamicCounts[key] = Array(days).fill(0);
-  return dynamicCounts[key];
+var key = weekKey();
+if (!dynamicCounts[key]) dynamicCounts[key] = [0,0,0,0,0,0];
+return dynamicCounts[key];
 }
 
-// Build initial table rows (no dynamic rows yet)
-function buildTable(){
-  const body=document.getElementById("body");
-  body.innerHTML="";
-  for(let r=0;r<initialRows;r++){
-    let tr=document.createElement("tr");
-    tr.dataset.static = "true";
-    let label=document.createElement("td"); label.innerText=r%2==0?"In":"Out"; tr.appendChild(label);
-    for(let d=0;d<days;d++){
-      let td=document.createElement("td");
-      let input=document.createElement("input");
-      input.type="tel"; input.inputMode="numeric"; input.pattern="[0-9]*";
-      input.dataset.r=r; input.dataset.d=d;
-      input.addEventListener("change",()=>{save();calc();});
-      input.addEventListener("blur",()=>{autoFormat(input);});
-      td.appendChild(input); tr.appendChild(td);
-    }
-    body.appendChild(tr);
-  }
-}
-
-// Create a dynamic in/out row pair for a given day, optionally suppressing save
 function createDynamicPair(day, suppressSave) {
-  const tbody=document.getElementById("body");
-  const inRow=document.createElement("tr");
-  const outRow=document.createElement("tr");
-  inRow.dataset.dynamic = day;
-  outRow.dataset.dynamic = day;
+var tbody = document.getElementById(‘body’);
+var inRow = document.createElement(‘tr’);
+var outRow = document.createElement(‘tr’);
+inRow.dataset.dynamic = String(day);
+outRow.dataset.dynamic = String(day);
 
-  const inLabel=document.createElement("td"); inLabel.innerText="In"; inRow.appendChild(inLabel);
-  const outLabel=document.createElement("td"); outLabel.innerText="Out"; outRow.appendChild(outLabel);
+var inLabel = document.createElement(‘td’); inLabel.innerText = ‘In’; inRow.appendChild(inLabel);
+var outLabel = document.createElement(‘td’); outLabel.innerText = ‘Out’; outRow.appendChild(outLabel);
 
-  for(let d=0;d<days;d++){
-    let inCell=document.createElement("td");
-    let outCell=document.createElement("td");
-    if(d===day){
-      let inInput=document.createElement("input");
-      inInput.type="tel"; inInput.inputMode="numeric"; inInput.pattern="[0-9]*";
-      inInput.dataset.r="dynamic"; inInput.dataset.d=d;
-      inInput.addEventListener("change",()=>{save();calc();});
-      inInput.addEventListener("blur",()=>{autoFormat(inInput);});
+for (var d = 0; d < days; d++) {
+var inCell = document.createElement(‘td’);
+var outCell = document.createElement(‘td’);
+if (d === day) {
+inCell.appendChild(makeInput(‘dyn’, d));
+outCell.appendChild(makeInput(‘dyn’, d));
+}
+inRow.appendChild(inCell);
+outRow.appendChild(outCell);
+}
+tbody.appendChild(inRow);
+tbody.appendChild(outRow);
 
-      let outInput=document.createElement("input");
-      outInput.type="tel"; outInput.inputMode="numeric"; outInput.pattern="[0-9]*";
-      outInput.dataset.r="dynamic"; outInput.dataset.d=d;
-      outInput.addEventListener("change",()=>{save();calc();});
-      outInput.addEventListener("blur",()=>{autoFormat(outInput);});
-
-      inCell.appendChild(inInput);
-      outCell.appendChild(outInput);
-    }
-    inRow.appendChild(inCell);
-    outRow.appendChild(outCell);
-  }
-  tbody.appendChild(inRow);
-  tbody.appendChild(outRow);
-
-  if (!suppressSave) {
-    // Increment count and save
-    const counts = getDynamicCounts();
-    counts[day]++;
-    saveStructure();
-    save();
-  }
+if (!suppressSave) {
+getDynamicCounts()[day]++;
+saveCurrentWeek();
+}
 }
 
-// Public-facing addEntry (called by + button)
-function addEntry(day) {
-  createDynamicPair(day, false);
+function addEntry(day) { createDynamicPair(day, false); }
+
+// ── Time helpers ───────────────────────────────────────────────────────────
+
+function parseTimeWithContext(v, prev) {
+if (!v) return null;
+v = v.toLowerCase().replace(/\s/g, ‘’);
+var h, m;
+if (/^\d{3,4}$/.test(v)) {
+h = parseInt(v.slice(0, -2), 10);
+m = parseInt(v.slice(-2), 10);
+} else {
+var m1 = v.match(/(\d{1,2})(?::(\d{2}))?(am|pm)?/);
+if (!m1) return null;
+h = parseInt(m1[1], 10);
+m = parseInt(m1[2] || 0, 10);
+if (m1[3] === ‘pm’ && h !== 12) h += 12;
+if (m1[3] === ‘am’ && h === 12) h = 0;
+}
+var minutes = h * 60 + m;
+if (prev != null && minutes <= prev) minutes += 12 * 60;
+return Math.round(minutes / 15) * 15;
 }
 
-// Auto-format input with AM/PM
-function autoFormat(input){
-  let prev=null;
-  const colInputs = Array.from(document.querySelectorAll(`input[data-d="${input.dataset.d}"]`));
-  for(let i=0;i<colInputs.length;i++){
-    if(colInputs[i]===input) break;
-    let t=parseTimeWithContext(colInputs[i].value, prev);
-    if(t!=null) prev=t;
-  }
-  let t=parseTimeWithContext(input.value, prev);
-  if(t!=null) input.value=formatTime(t);
-  calc();
+function formatTime(minutes) {
+minutes = minutes % (24 * 60);
+var h = Math.floor(minutes / 60), m = minutes % 60;
+var ampm = h >= 12 ? ‘PM’ : ‘AM’;
+h = h % 12; if (h === 0) h = 12;
+return h + ‘:’ + (m < 10 ? ‘0’ : ‘’) + m + ’ ’ + ampm;
 }
 
-// Parse time with context
-function parseTimeWithContext(v, prev=null){
-  if(!v) return null;
-  v=v.toLowerCase().replace(/\s/g,'');
-  let h,m;
-  if(/^\d{3,4}$/.test(v)){ h=v.slice(0,-2); m=v.slice(-2); }
-  else{ let m1=v.match(/(\d{1,2})(?::(\d{2}))?(am|pm)?/); if(!m1) return null; h=parseInt(m1[1]); m=parseInt(m1[2]||0); if(m1[3]=="pm"&&h!=12) h+=12; if(m1[3]=="am"&&h==12) h=0; }
-  h=parseInt(h); m=parseInt(m);
-  let minutes=h*60+m;
-  if(prev!=null && minutes<=prev) minutes+=12*60;
-  return roundMinutes(minutes);
+function autoFormat(input) {
+var prev = null;
+var colInputs = Array.from(document.querySelectorAll(‘input[data-d=”’ + input.dataset.d + ‘”]’));
+for (var i = 0; i < colInputs.length; i++) {
+if (colInputs[i] === input) break;
+var t = parseTimeWithContext(colInputs[i].value, prev);
+if (t != null) prev = t;
+}
+var t = parseTimeWithContext(input.value, prev);
+if (t != null) input.value = formatTime(t);
+calc();
 }
 
-// Format minutes as h:mm AM/PM
-function formatTime(minutes){
-  minutes = minutes % (24*60);
-  let h=Math.floor(minutes/60), m=minutes%60;
-  let ampm = h>=12?"PM":"AM";
-  h=h%12; if(h===0) h=12;
-  return `${h}:${m<10?"0":""}${m} ${ampm}`;
+// ── Calc ───────────────────────────────────────────────────────────────────
+
+function calc() {
+var week = 0;
+for (var d = 0; d < days; d++) {
+var total = 0, prev = null;
+var inputs = document.querySelectorAll(‘input[data-d=”’ + d + ‘”]’);
+for (var i = 0; i < inputs.length; i += 2) {
+var t1 = parseTimeWithContext(inputs[i] ? inputs[i].value : ‘’, prev);
+if (t1 != null) prev = t1;
+var t2 = parseTimeWithContext(inputs[i+1] ? inputs[i+1].value : ‘’, t1);
+if (t2 != null) prev = t2;
+if (t1 != null && t2 != null) total += t2 - t1;
+}
+var hrs = total / 60;
+week += hrs;
+document.getElementById(‘t’ + d).innerHTML =
+hrs.toFixed(2) + “<div class='bar' style='width:" + Math.min(hrs / 12 * 100, 100) + "%'></div>”;
+}
+document.getElementById(‘weekTotal’).innerText = week.toFixed(2);
+document.getElementById(‘weekTotal’).style.color = week > 40 ? ‘red’ : ‘black’;
 }
 
-function roundMinutes(minutes){ return Math.round(minutes/15)*15; }
+// ── Clock in/out ───────────────────────────────────────────────────────────
 
-function calc(){
-  let week=0;
-  for(let d=0;d<days;d++){
-    let total=0; let prev=null;
-    const inputs=document.querySelectorAll(`input[data-d="${d}"]`);
-    for(let i=0;i<inputs.length;i+=2){
-      const t1=parseTimeWithContext(inputs[i]?.value, prev); if(t1!=null) prev=t1;
-      const t2=parseTimeWithContext(inputs[i+1]?.value, t1); if(t2!=null) prev=t2;
-      if(t1!=null && t2!=null) total+=t2-t1;
-    }
-    let hrs = total/60; week+=hrs;
-    document.getElementById("t"+d).innerHTML=hrs.toFixed(2)+"<div class='bar' style='width:"+Math.min(hrs/12*100,100)+"%'></div>";
-  }
-  document.getElementById("weekTotal").innerText=week.toFixed(2);
-  document.getElementById("weekTotal").style.color=week>40?"red":"black";
+function clockAuto() {
+var day = (new Date().getDay() + 6) % 7;
+if (day > 5) return;
+var inputs = document.querySelectorAll(‘input[data-d=”’ + day + ‘”]’);
+for (var i = 0; i < inputs.length; i++) {
+if (!inputs[i].value) {
+if (i === inputs.length - 1) { addEntry(day); }
+var now = new Date();
+var minutes = Math.round((now.getHours() * 60 + now.getMinutes()) / 15) * 15;
+inputs[i].value = formatTime(minutes);
+break;
+}
+}
+saveCurrentWeek();
+calc();
 }
 
-// Clock in/out
-function clockAuto(){
-  let day=(new Date().getDay()+6)%7; if(day>5) return;
-  const inputs=document.querySelectorAll(`input[data-d="${day}"]`);
-  for(let i=0;i<inputs.length;i++){
-    if(!inputs[i].value){
-      if(i===inputs.length-1){ addEntry(day); }
-      const now=new Date(); let minutes=Math.round((now.getHours()*60+now.getMinutes())/15)*15;
-      let h=Math.floor(minutes/60), m=minutes%60; const ampm=h>=12?"PM":"AM";
-      h=h%12; if(h===0) h=12; inputs[i].value=`${h}:${m<10?"0":""}${m} ${ampm}`;
-      break;
-    }
-  }
-  save(); calc();
+// ── Save / Load ────────────────────────────────────────────────────────────
+
+function saveCurrentWeek() {
+var allData = loadAllData();
+var key = weekKey();
+allData[key + ‘_structure’] = getDynamicCounts();
+var data = [];
+document.querySelectorAll(‘input’).forEach(function(inp) { data.push(inp.value); });
+allData[key] = data;
+saveAllData(allData);
 }
 
-// Week key
-function weekKey(){
-  let d=new Date();
-  d.setDate(d.getDate()-(d.getDay()+6)%7);
-  d.setDate(d.getDate()+weekOffset*7);
-  return "week_"+d.toISOString().slice(0,10);
+function load() {
+buildTable();
+var allData = loadAllData();
+var key = weekKey();
+
+var savedCounts = allData[key + ‘_structure’] || null;
+if (savedCounts) {
+dynamicCounts[key] = savedCounts;
+for (var d = 0; d < days; d++) {
+for (var i = 0; i < savedCounts[d]; i++) {
+createDynamicPair(d, true);
+}
+}
+} else {
+dynamicCounts[key] = [0,0,0,0,0,0];
 }
 
-// Save dynamic row structure (counts per day) to localStorage
-function saveStructure() {
-  const key = weekKey();
-  localStorage.setItem(key+"_structure", JSON.stringify(getDynamicCounts()));
-}
-
-// Save all input values
-function save(){
-  const data = [];
-  document.querySelectorAll("input").forEach(i => data.push(i.value));
-  localStorage.setItem(weekKey(), JSON.stringify(data));
-}
-
-// Load: first restore structure (dynamic rows), then restore values
-function load(){
-  buildTable();
-
-  // Restore dynamic row counts for this week
-  const key = weekKey();
-  const savedCounts = JSON.parse(localStorage.getItem(key+"_structure") || "null");
-  if (savedCounts) {
-    dynamicCounts[key] = savedCounts;
-    // Recreate dynamic rows without triggering another save
-    for (let d = 0; d < days; d++) {
-      for (let i = 0; i < savedCounts[d]; i++) {
-        createDynamicPair(d, true);
-      }
-    }
-  } else {
-    dynamicCounts[key] = Array(days).fill(0);
-  }
-
-  // Now restore all values
-  const saved = JSON.parse(localStorage.getItem(key) || "[]");
-  const inputs = document.querySelectorAll("input");
-  inputs.forEach((input, idx) => {
-    if (saved[idx] !== undefined) input.value = saved[idx];
-  });
-
-  updateWeekLabel();
-  calc();
-}
-
-// Update week label
-function updateWeekLabel(){
-  let d = new Date();
-  d.setDate(d.getDate()-(d.getDay()+6)%7 + weekOffset*7);
-  document.getElementById("weekLabel").innerText=`Timecard: Week of ${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
-}
-
-// CSV export
-function exportCSV(){
-  const table = document.getElementById("table");
-  const rows = [];
-  table.querySelectorAll("tbody tr").forEach(tr=>{
-    const row=[];
-    tr.querySelectorAll("td").forEach(td=>{
-      const input = td.querySelector("input");
-      row.push(input ? input.value : td.innerText);
-    });
-    rows.push(row.join(","));
-  });
-  const totalRow = ["Total"];
-  for(let d=0; d<6; d++){
-    const t = document.getElementById("t"+d).innerText.replace(/\n.*/,"");
-    totalRow.push(t);
-  }
-  rows.push(totalRow.join(","));
-  let d = new Date();
-  d.setDate(d.getDate()-(d.getDay()+6)%7);
-  const filename = `timecard_${d.toISOString().slice(0,10)}.csv`;
-  const blob = new Blob([rows.join("\n")], {type:"text/csv"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-}
-
-// Swipe detection
-let startX=null;
-document.addEventListener("touchstart", e=>startX=e.touches[0].clientX);
-document.addEventListener("touchend", e=>{
-  let dx=e.changedTouches[0].clientX-startX;
-  if(dx>80) { weekOffset--; load(); }
-  if(dx<-80) { weekOffset++; load(); }
+var saved = allData[key] || [];
+var inputs = document.querySelectorAll(‘input’);
+inputs.forEach(function(input, idx) {
+if (saved[idx] !== undefined) input.value = saved[idx];
 });
 
-// Down arrow moves down column
-document.addEventListener("keydown", function(e){
-  if(e.key !== "ArrowDown") return;
-  const active = document.activeElement;
-  if(!active || active.tagName !== "INPUT") return;
-  e.preventDefault();
-  const col = active.dataset.d;
-  const allColInputs = Array.from(document.querySelectorAll(`input[data-d="${col}"]`));
-  const index = allColInputs.indexOf(active);
-  if(index >= 0 && index < allColInputs.length-1){
-    allColInputs[index+1].focus();
-  }
+updateWeekLabel();
+calc();
+
+var hasData = saved.some(function(v) { return !!v; });
+document.getElementById(‘saveStatus’).textContent = hasData ? ‘Data loaded \u2713’ : ‘No entries this week’;
+}
+
+function changeWeek(dir) {
+weekOffset += dir;
+load();
+}
+
+function updateWeekLabel() {
+var d = new Date();
+d.setDate(d.getDate() - (d.getDay() + 6) % 7 + weekOffset * 7);
+var mo = String(d.getMonth() + 1).padStart(2, ‘0’);
+var dy = String(d.getDate()).padStart(2, ‘0’);
+document.getElementById(‘weekLabel’).innerText =
+’Week of ’ + mo + ‘/’ + dy + ‘/’ + d.getFullYear();
+}
+
+// ── Export CSV ─────────────────────────────────────────────────────────────
+
+function exportCSV() {
+var rows = [];
+document.querySelectorAll(’#body tr’).forEach(function(tr) {
+var row = [];
+tr.querySelectorAll(‘td’).forEach(function(td) {
+var input = td.querySelector(‘input’);
+row.push(input ? input.value : td.innerText);
+});
+rows.push(row.join(’,’));
+});
+var totalRow = [‘Total’];
+for (var d = 0; d < 6; d++) {
+totalRow.push(document.getElementById(‘t’ + d).innerText.replace(/\n.*/,’’));
+}
+rows.push(totalRow.join(’,’));
+var d2 = new Date();
+d2.setDate(d2.getDate() - (d2.getDay() + 6) % 7 + weekOffset * 7);
+var blob = new Blob([rows.join(’\n’)], { type: ‘text/csv’ });
+var a = document.createElement(‘a’);
+a.href = URL.createObjectURL(blob);
+a.download = ‘timecard_’ + d2.toISOString().slice(0, 10) + ‘.csv’;
+document.body.appendChild(a);
+a.click();
+setTimeout(function() { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 100);
+}
+
+// ── Swipe to change week ───────────────────────────────────────────────────
+
+var startX = null;
+document.addEventListener(‘touchstart’, function(e) { startX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener(‘touchend’, function(e) {
+if (startX === null) return;
+var dx = e.changedTouches[0].clientX - startX;
+startX = null;
+if (Math.abs(dx) > 80) changeWeek(dx > 0 ? -1 : 1);
 });
 
 load();
