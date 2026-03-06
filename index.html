@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -151,16 +152,30 @@ button.addEntry{
 </div>
 
 <script>
-const days=6; let weekOffset=0, initialRows=6;
+const days=6;
+let weekOffset=0, initialRows=6;
 
-// Build initial table
+// Track how many extra entry pairs have been added per day
+// dynamicCounts[weekKey][day] = number of extra in/out pairs
+let dynamicCounts = {};
+
+function getDynamicCounts() {
+  const key = weekKey();
+  if (!dynamicCounts[key]) dynamicCounts[key] = Array(days).fill(0);
+  return dynamicCounts[key];
+}
+
+// Build initial table rows (no dynamic rows yet)
 function buildTable(){
-  const body=document.getElementById("body"); body.innerHTML="";
+  const body=document.getElementById("body");
+  body.innerHTML="";
   for(let r=0;r<initialRows;r++){
     let tr=document.createElement("tr");
+    tr.dataset.static = "true";
     let label=document.createElement("td"); label.innerText=r%2==0?"In":"Out"; tr.appendChild(label);
     for(let d=0;d<days;d++){
-      let td=document.createElement("td"); let input=document.createElement("input");
+      let td=document.createElement("td");
+      let input=document.createElement("input");
       input.type="tel"; input.inputMode="numeric"; input.pattern="[0-9]*";
       input.dataset.r=r; input.dataset.d=d;
       input.addEventListener("change",()=>{save();calc();});
@@ -170,31 +185,55 @@ function buildTable(){
     body.appendChild(tr);
   }
 }
-buildTable();
 
-// Add dynamic in/out rows
-function addEntry(day){
+// Create a dynamic in/out row pair for a given day, optionally suppressing save
+function createDynamicPair(day, suppressSave) {
   const tbody=document.getElementById("body");
-  const inRow=document.createElement("tr"); const outRow=document.createElement("tr");
+  const inRow=document.createElement("tr");
+  const outRow=document.createElement("tr");
+  inRow.dataset.dynamic = day;
+  outRow.dataset.dynamic = day;
+
   const inLabel=document.createElement("td"); inLabel.innerText="In"; inRow.appendChild(inLabel);
   const outLabel=document.createElement("td"); outLabel.innerText="Out"; outRow.appendChild(outLabel);
+
   for(let d=0;d<days;d++){
-    let inCell=document.createElement("td"); let outCell=document.createElement("td");
+    let inCell=document.createElement("td");
+    let outCell=document.createElement("td");
     if(d===day){
-      let inInput=document.createElement("input"); inInput.type="tel"; inInput.inputMode="numeric"; inInput.pattern="[0-9]*";
-      inInput.dataset.r="dynamic"; inInput.dataset.d=d; 
-      inInput.addEventListener("change",()=>{save();calc();}); 
+      let inInput=document.createElement("input");
+      inInput.type="tel"; inInput.inputMode="numeric"; inInput.pattern="[0-9]*";
+      inInput.dataset.r="dynamic"; inInput.dataset.d=d;
+      inInput.addEventListener("change",()=>{save();calc();});
       inInput.addEventListener("blur",()=>{autoFormat(inInput);});
-      let outInput=document.createElement("input"); outInput.type="tel"; outInput.inputMode="numeric"; outInput.pattern="[0-9]*";
-      outInput.dataset.r="dynamic"; outInput.dataset.d=d; 
-      outInput.addEventListener("change",()=>{save();calc();}); 
+
+      let outInput=document.createElement("input");
+      outInput.type="tel"; outInput.inputMode="numeric"; outInput.pattern="[0-9]*";
+      outInput.dataset.r="dynamic"; outInput.dataset.d=d;
+      outInput.addEventListener("change",()=>{save();calc();});
       outInput.addEventListener("blur",()=>{autoFormat(outInput);});
-      inCell.appendChild(inInput); outCell.appendChild(outInput);
+
+      inCell.appendChild(inInput);
+      outCell.appendChild(outInput);
     }
-    inRow.appendChild(inCell); outRow.appendChild(outCell);
+    inRow.appendChild(inCell);
+    outRow.appendChild(outCell);
   }
-  tbody.appendChild(inRow); tbody.appendChild(outRow);
-  save(); // Save dynamic row immediately
+  tbody.appendChild(inRow);
+  tbody.appendChild(outRow);
+
+  if (!suppressSave) {
+    // Increment count and save
+    const counts = getDynamicCounts();
+    counts[day]++;
+    saveStructure();
+    save();
+  }
+}
+
+// Public-facing addEntry (called by + button)
+function addEntry(day) {
+  createDynamicPair(day, false);
 }
 
 // Auto-format input with AM/PM
@@ -268,23 +307,53 @@ function clockAuto(){
   save(); calc();
 }
 
-// Week storage
-function weekKey(){ let d=new Date(); d.setDate(d.getDate()-(d.getDay()+6)%7); d.setDate(d.getDate()+weekOffset*7); return "week_"+d.toISOString().slice(0,10); }
+// Week key
+function weekKey(){
+  let d=new Date();
+  d.setDate(d.getDate()-(d.getDay()+6)%7);
+  d.setDate(d.getDate()+weekOffset*7);
+  return "week_"+d.toISOString().slice(0,10);
+}
 
-// Save all inputs
-function save(){ 
+// Save dynamic row structure (counts per day) to localStorage
+function saveStructure() {
+  const key = weekKey();
+  localStorage.setItem(key+"_structure", JSON.stringify(getDynamicCounts()));
+}
+
+// Save all input values
+function save(){
   const data = [];
   document.querySelectorAll("input").forEach(i => data.push(i.value));
   localStorage.setItem(weekKey(), JSON.stringify(data));
 }
 
-// Load all inputs (dynamic rows restored)
-function load(){ 
-  const saved = JSON.parse(localStorage.getItem(weekKey()) || "[]");
+// Load: first restore structure (dynamic rows), then restore values
+function load(){
+  buildTable();
+
+  // Restore dynamic row counts for this week
+  const key = weekKey();
+  const savedCounts = JSON.parse(localStorage.getItem(key+"_structure") || "null");
+  if (savedCounts) {
+    dynamicCounts[key] = savedCounts;
+    // Recreate dynamic rows without triggering another save
+    for (let d = 0; d < days; d++) {
+      for (let i = 0; i < savedCounts[d]; i++) {
+        createDynamicPair(d, true);
+      }
+    }
+  } else {
+    dynamicCounts[key] = Array(days).fill(0);
+  }
+
+  // Now restore all values
+  const saved = JSON.parse(localStorage.getItem(key) || "[]");
   const inputs = document.querySelectorAll("input");
   inputs.forEach((input, idx) => {
-    if(saved[idx] !== undefined) input.value = saved[idx];
+    if (saved[idx] !== undefined) input.value = saved[idx];
   });
+
   updateWeekLabel();
   calc();
 }
@@ -328,18 +397,17 @@ function exportCSV(){
 let startX=null;
 document.addEventListener("touchstart", e=>startX=e.touches[0].clientX);
 document.addEventListener("touchend", e=>{
-  let dx=e.changedTouches[0].clientX-startX; 
+  let dx=e.changedTouches[0].clientX-startX;
   if(dx>80) { weekOffset--; load(); }
   if(dx<-80) { weekOffset++; load(); }
 });
 
-// Down arrow moves down column in all inputs
+// Down arrow moves down column
 document.addEventListener("keydown", function(e){
   if(e.key !== "ArrowDown") return;
   const active = document.activeElement;
   if(!active || active.tagName !== "INPUT") return;
   e.preventDefault();
-  
   const col = active.dataset.d;
   const allColInputs = Array.from(document.querySelectorAll(`input[data-d="${col}"]`));
   const index = allColInputs.indexOf(active);
