@@ -362,7 +362,7 @@ function load(){
 function updateWeekLabel(){
   let d = new Date();
   d.setDate(d.getDate()-(d.getDay()+6)%7 + weekOffset*7);
-  document.getElementById("weekLabel").innerText=`Timecard: Week of ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  document.getElementById("weekLabel").innerText=`Timecard: Week of ${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
 // CSV export
