@@ -21,7 +21,7 @@ body{
   width:95%;
   background:#fdfaf0;
   border-radius:16px;
-  border: 2px solid #fff;
+  border:2px solid #fff;
   box-shadow:0 6px 18px rgba(0,0,0,.4);
   display:flex;
   flex-direction:column;
@@ -43,7 +43,7 @@ body{
   padding:10px 15px;
   overflow-x:auto;
 }
-.slide-wrapper { transition: transform 0.3s ease-in-out; }
+.slide-wrapper{ transition:transform 0.3s ease-in-out; }
 table{
   width:100%;
   border-collapse:collapse;
@@ -81,6 +81,7 @@ button.clock{
   width:100%;
   padding:12px;
   border:none;
+  font-weight:600;
 }
 button.addEntry{
   background:#007aff;
@@ -137,8 +138,8 @@ button.addEntry{
             <td class="total" id="t5"></td>
           </tr>
           <tr class="weekTotalRow">
-            <td colspan="5" style="text-align:left; padding-left:8px;">Week Total</td>
-            <td colspan="2" style="text-align:right; padding-right:8px;" class="weekTotal" id="weekTotal"></td>
+            <td colspan="5" style="text-align:left;padding-left:8px;">Week Total</td>
+            <td colspan="2" style="text-align:right;padding-right:8px;" class="weekTotal" id="weekTotal"></td>
           </tr>
         </tfoot>
       </table>
@@ -154,13 +155,33 @@ button.addEntry{
 <script>
 const days=6;
 let weekOffset=0, initialRows=6;
+let dynamicCounts={};
 
-let dynamicCounts = {};
-
-function getDynamicCounts() {
-  const key = weekKey();
-  if (!dynamicCounts[key]) dynamicCounts[key] = Array(days).fill(0);
+function getDynamicCounts(){
+  const key=weekKey();
+  if(!dynamicCounts[key]) dynamicCounts[key]=Array(days).fill(0);
   return dynamicCounts[key];
+}
+
+function makeInput(r,d){
+  const input=document.createElement("input");
+  input.type="tel"; input.inputMode="numeric"; input.pattern="[0-9]*";
+  input.enterKeyHint="next";
+  input.dataset.r=r; input.dataset.d=d;
+  input.addEventListener("change",()=>{save();calc();});
+  input.addEventListener("blur",()=>{autoFormat(input);});
+  input.addEventListener("keydown",(e)=>{
+    if(e.key==="Enter"||e.keyCode===13){ e.preventDefault(); moveDown(input); }
+  });
+  return input;
+}
+
+function moveDown(input){
+  const col=input.dataset.d;
+  const all=Array.from(document.querySelectorAll(`input[data-d="${col}"]`));
+  const idx=all.indexOf(input);
+  if(idx>=0&&idx<all.length-1) all[idx+1].focus();
+  else input.blur();
 }
 
 function buildTable(){
@@ -168,45 +189,21 @@ function buildTable(){
   body.innerHTML="";
   for(let r=0;r<initialRows;r++){
     let tr=document.createElement("tr");
-    tr.dataset.static = "true";
     let label=document.createElement("td"); label.innerText=r%2==0?"In":"Out"; tr.appendChild(label);
     for(let d=0;d<days;d++){
       let td=document.createElement("td");
-      let input=document.createElement("input");
-      input.type="tel"; input.inputMode="numeric"; input.pattern="[0-9]*";
-      input.dataset.r=r; input.dataset.d=d;
-      input.addEventListener("change",()=>{save();calc();});
-      input.addEventListener("blur",()=>{autoFormat(input);});
-      // Move focus down the column on Enter
-      input.addEventListener("keydown",(e)=>{
-        if(e.key==="Enter"||e.keyCode===13){
-          e.preventDefault();
-          moveDown(input);
-        }
-      });
-      td.appendChild(input); tr.appendChild(td);
+      td.appendChild(makeInput(r,d));
+      tr.appendChild(td);
     }
     body.appendChild(tr);
   }
 }
 
-function moveDown(input) {
-  const col = input.dataset.d;
-  const allColInputs = Array.from(document.querySelectorAll(`input[data-d="${col}"]`));
-  const index = allColInputs.indexOf(input);
-  if(index >= 0 && index < allColInputs.length - 1){
-    allColInputs[index + 1].focus();
-  } else {
-    input.blur();
-  }
-}
-
-function createDynamicPair(day, suppressSave) {
+function createDynamicPair(day,suppressSave){
   const tbody=document.getElementById("body");
   const inRow=document.createElement("tr");
   const outRow=document.createElement("tr");
-  inRow.dataset.dynamic = day;
-  outRow.dataset.dynamic = day;
+  inRow.dataset.dynamic=day; outRow.dataset.dynamic=day;
 
   const inLabel=document.createElement("td"); inLabel.innerText="In"; inRow.appendChild(inLabel);
   const outLabel=document.createElement("td"); outLabel.innerText="Out"; outRow.appendChild(outLabel);
@@ -215,79 +212,52 @@ function createDynamicPair(day, suppressSave) {
     let inCell=document.createElement("td");
     let outCell=document.createElement("td");
     if(d===day){
-      let inInput=document.createElement("input");
-      inInput.type="tel"; inInput.inputMode="numeric"; inInput.pattern="[0-9]*";
-      inInput.dataset.r="dynamic"; inInput.dataset.d=d;
-      inInput.addEventListener("change",()=>{save();calc();});
-      inInput.addEventListener("blur",()=>{autoFormat(inInput);});
-      inInput.addEventListener("keydown",(e)=>{
-        if(e.key==="Enter"||e.keyCode===13){
-          e.preventDefault();
-          moveDown(inInput);
-        }
-      });
-
-      let outInput=document.createElement("input");
-      outInput.type="tel"; outInput.inputMode="numeric"; outInput.pattern="[0-9]*";
-      outInput.dataset.r="dynamic"; outInput.dataset.d=d;
-      outInput.addEventListener("change",()=>{save();calc();});
-      outInput.addEventListener("blur",()=>{autoFormat(outInput);});
-      outInput.addEventListener("keydown",(e)=>{
-        if(e.key==="Enter"||e.keyCode===13){
-          e.preventDefault();
-          moveDown(outInput);
-        }
-      });
-
-      inCell.appendChild(inInput);
-      outCell.appendChild(outInput);
+      inCell.appendChild(makeInput("dyn",d));
+      outCell.appendChild(makeInput("dyn",d));
     }
-    inRow.appendChild(inCell);
-    outRow.appendChild(outCell);
+    inRow.appendChild(inCell); outRow.appendChild(outCell);
   }
-  tbody.appendChild(inRow);
-  tbody.appendChild(outRow);
-
-  if (!suppressSave) {
-    const counts = getDynamicCounts();
-    counts[day]++;
-    save();
-  }
+  tbody.appendChild(inRow); tbody.appendChild(outRow);
+  if(!suppressSave){ getDynamicCounts()[day]++; save(); }
 }
 
-function addEntry(day) {
-  createDynamicPair(day, false);
-}
+function addEntry(day){ createDynamicPair(day,false); }
 
 function autoFormat(input){
   let prev=null;
-  const colInputs = Array.from(document.querySelectorAll(`input[data-d="${input.dataset.d}"]`));
+  const colInputs=Array.from(document.querySelectorAll(`input[data-d="${input.dataset.d}"]`));
   for(let i=0;i<colInputs.length;i++){
     if(colInputs[i]===input) break;
-    let t=parseTimeWithContext(colInputs[i].value, prev);
+    let t=parseTimeWithContext(colInputs[i].value,prev);
     if(t!=null) prev=t;
   }
-  let t=parseTimeWithContext(input.value, prev);
+  let t=parseTimeWithContext(input.value,prev);
   if(t!=null) input.value=formatTime(t);
   calc();
 }
 
-function parseTimeWithContext(v, prev=null){
+function parseTimeWithContext(v,prev=null){
   if(!v) return null;
   v=v.toLowerCase().replace(/\s/g,'');
   let h,m;
   if(/^\d{3,4}$/.test(v)){ h=v.slice(0,-2); m=v.slice(-2); }
-  else{ let m1=v.match(/(\d{1,2})(?::(\d{2}))?(am|pm)?/); if(!m1) return null; h=parseInt(m1[1]); m=parseInt(m1[2]||0); if(m1[3]=="pm"&&h!=12) h+=12; if(m1[3]=="am"&&h==12) h=0; }
+  else{
+    let m1=v.match(/(\d{1,2})(?::(\d{2}))?(am|pm)?/);
+    if(!m1) return null;
+    h=parseInt(m1[1]); m=parseInt(m1[2]||0);
+    if(m1[3]=="pm"&&h!=12) h+=12;
+    if(m1[3]=="am"&&h==12) h=0;
+  }
   h=parseInt(h); m=parseInt(m);
   let minutes=h*60+m;
-  if(prev!=null && minutes<=prev) minutes+=12*60;
+  if(prev!=null&&minutes<=prev) minutes+=12*60;
   return roundMinutes(minutes);
 }
 
 function formatTime(minutes){
-  minutes = minutes % (24*60);
-  let h=Math.floor(minutes/60), m=minutes%60;
-  let ampm = h>=12?"PM":"AM";
+  minutes=minutes%(24*60);
+  let h=Math.floor(minutes/60),m=minutes%60;
+  let ampm=h>=12?"PM":"AM";
   h=h%12; if(h===0) h=12;
   return `${h}:${m<10?"0":""}${m} ${ampm}`;
 }
@@ -297,14 +267,14 @@ function roundMinutes(minutes){ return Math.round(minutes/15)*15; }
 function calc(){
   let week=0;
   for(let d=0;d<days;d++){
-    let total=0; let prev=null;
+    let total=0,prev=null;
     const inputs=document.querySelectorAll(`input[data-d="${d}"]`);
     for(let i=0;i<inputs.length;i+=2){
-      const t1=parseTimeWithContext(inputs[i]?.value, prev); if(t1!=null) prev=t1;
-      const t2=parseTimeWithContext(inputs[i+1]?.value, t1); if(t2!=null) prev=t2;
-      if(t1!=null && t2!=null) total+=t2-t1;
+      const t1=parseTimeWithContext(inputs[i]?.value,prev); if(t1!=null) prev=t1;
+      const t2=parseTimeWithContext(inputs[i+1]?.value,t1); if(t2!=null) prev=t2;
+      if(t1!=null&&t2!=null) total+=t2-t1;
     }
-    let hrs = total/60; week+=hrs;
+    let hrs=total/60; week+=hrs;
     document.getElementById("t"+d).innerHTML=hrs.toFixed(2)+"<div class='bar' style='width:"+Math.min(hrs/12*100,100)+"%'></div>";
   }
   document.getElementById("weekTotal").innerText=week.toFixed(2);
@@ -318,7 +288,7 @@ function clockAuto(){
     if(!inputs[i].value){
       if(i===inputs.length-1){ addEntry(day); }
       const now=new Date(); let minutes=Math.round((now.getHours()*60+now.getMinutes())/15)*15;
-      let h=Math.floor(minutes/60), m=minutes%60; const ampm=h>=12?"PM":"AM";
+      let h=Math.floor(minutes/60),m=minutes%60; const ampm=h>=12?"PM":"AM";
       h=h%12; if(h===0) h=12; inputs[i].value=`${h}:${m<10?"0":""}${m} ${ampm}`;
       break;
     }
@@ -328,124 +298,87 @@ function clockAuto(){
 
 function weekKey(){
   let d=new Date();
-  d.setDate(d.getDate()-(d.getDay()+6)%7);
-  d.setDate(d.getDate()+weekOffset*7);
+  d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
   return "week_"+d.toISOString().slice(0,10);
 }
 
-// ── Dual storage: localStorage + URL hash backup ───────────────────────────
-
-function getAllData() {
-  // Try localStorage first
-  try {
-    const raw = localStorage.getItem('tc_alldata');
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  // Fall back to URL hash
-  try {
-    if (window.location.hash && window.location.hash.length > 1) {
-      const decoded = decodeURIComponent(escape(atob(window.location.hash.slice(1))));
-      const data = JSON.parse(decoded);
-      // Restore to localStorage
-      try { localStorage.setItem('tc_alldata', JSON.stringify(data)); } catch(e) {}
-      return data;
-    }
-  } catch(e) {}
+function getAllData(){
+  try{ const r=localStorage.getItem('tc_alldata'); if(r) return JSON.parse(r); }catch(e){}
   return {};
 }
 
-function setAllData(allData) {
-  // Save to localStorage
-  try { localStorage.setItem('tc_alldata', JSON.stringify(allData)); } catch(e) {}
-  // Save to URL hash as backup
-  try {
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(allData))));
-    history.replaceState(null, '', '#' + encoded);
-  } catch(e) {}
+function setAllData(d){
+  try{ localStorage.setItem('tc_alldata',JSON.stringify(d)); }catch(e){}
 }
 
 function save(){
-  const allData = getAllData();
-  const key = weekKey();
-  // Save structure
-  allData[key + '_structure'] = getDynamicCounts();
-  // Save values
-  const data = [];
-  document.querySelectorAll("input").forEach(i => data.push(i.value));
-  allData[key] = data;
+  const allData=getAllData();
+  const key=weekKey();
+  allData[key+'_structure']=getDynamicCounts();
+  const data=[];
+  document.querySelectorAll("input").forEach(i=>data.push(i.value));
+  allData[key]=data;
   setAllData(allData);
 }
 
 function load(){
   buildTable();
+  const allData=getAllData();
+  const key=weekKey();
 
-  const allData = getAllData();
-  const key = weekKey();
-
-  const savedCounts = allData[key + '_structure'] || null;
-  if (savedCounts) {
-    dynamicCounts[key] = savedCounts;
-    for (let d = 0; d < days; d++) {
-      for (let i = 0; i < savedCounts[d]; i++) {
-        createDynamicPair(d, true);
-      }
-    }
+  const savedCounts=allData[key+'_structure']||null;
+  if(savedCounts){
+    dynamicCounts[key]=savedCounts;
+    for(let d=0;d<days;d++)
+      for(let i=0;i<savedCounts[d];i++)
+        createDynamicPair(d,true);
   } else {
-    dynamicCounts[key] = Array(days).fill(0);
+    dynamicCounts[key]=Array(days).fill(0);
   }
 
-  const saved = allData[key] || [];
-  const inputs = document.querySelectorAll("input");
-  inputs.forEach((input, idx) => {
-    if (saved[idx] !== undefined) input.value = saved[idx];
-  });
+  const saved=allData[key]||[];
+  const inputs=document.querySelectorAll("input");
+  inputs.forEach((inp,idx)=>{ if(saved[idx]!==undefined) inp.value=saved[idx]; });
 
   updateWeekLabel();
   calc();
 }
 
 function updateWeekLabel(){
-  let d = new Date();
-  d.setDate(d.getDate()-(d.getDay()+6)%7 + weekOffset*7);
+  let d=new Date();
+  d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
   document.getElementById("weekLabel").innerText=`Timecard: Week of ${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
 function exportCSV(){
-  const table = document.getElementById("table");
-  const rows = [];
-  table.querySelectorAll("tbody tr").forEach(tr=>{
+  const rows=[];
+  document.querySelectorAll("#body tr").forEach(tr=>{
     const row=[];
     tr.querySelectorAll("td").forEach(td=>{
-      const input = td.querySelector("input");
-      row.push(input ? input.value : td.innerText);
+      const input=td.querySelector("input");
+      row.push(input?input.value:td.innerText);
     });
     rows.push(row.join(","));
   });
-  const totalRow = ["Total"];
-  for(let d=0; d<6; d++){
-    const t = document.getElementById("t"+d).innerText.replace(/\n.*/,"");
-    totalRow.push(t);
-  }
+  const totalRow=["Total"];
+  for(let d=0;d<6;d++) totalRow.push(document.getElementById("t"+d).innerText.replace(/\n.*/,""));
   rows.push(totalRow.join(","));
-  let d = new Date();
-  d.setDate(d.getDate()-(d.getDay()+6)%7);
-  const filename = `timecard_${d.toISOString().slice(0,10)}.csv`;
-  const blob = new Blob([rows.join("\n")], {type:"text/csv"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 100);
+  let d=new Date();
+  d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
+  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`timecard_${d.toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(a.href); },100);
 }
 
-// Swipe detection
 let startX=null;
-document.addEventListener("touchstart", e=>startX=e.touches[0].clientX, {passive:true});
-document.addEventListener("touchend", e=>{
-  let dx=e.changedTouches[0].clientX-startX;
-  if(dx>80) { weekOffset--; load(); }
-  if(dx<-80) { weekOffset++; load(); }
+document.addEventListener("touchstart",e=>startX=e.touches[0].clientX,{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(dx>80){ weekOffset--; load(); }
+  if(dx<-80){ weekOffset++; load(); }
 });
 
 load();
