@@ -286,10 +286,15 @@ button.clock:active{ opacity:0.85; transform:scale(0.99); }
     <button class="export-btn" onclick="exportCSV()">Export CSV</button>
   </div>
 
-  <div id="diagBar" style="background:#1f1f1f;border-bottom:1px solid #333;padding:5px 18px;font-size:10px;font-family:monospace;color:#666;display:flex;justify-content:space-between;gap:8px;">
-    <span id="diagSaved">Last saved: —</span>
-    <span id="diagEntries">Entries: —</span>
-    <span id="diagOrigin" style="color:#444;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;"></span>
+  <div id="diagBar" style="background:#1f1f1f;border-bottom:1px solid #333;padding:5px 18px;font-size:10px;font-family:monospace;color:#666;display:flex;flex-direction:column;gap:2px;">
+    <div style="display:flex;justify-content:space-between;">
+      <span id="diagSaved">Last saved: —</span>
+      <span id="diagEntries">Entries: —</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <span id="diagKey" style="color:#555;">Key: —</span>
+      <span id="diagOrigin" style="color:#444;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;"></span>
+    </div>
   </div>
 
   <div class="container">
@@ -499,7 +504,11 @@ function changeWeek(dir){ weekOffset+=dir; load(); }
 function weekKey(){
   let d=new Date();
   d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
-  return "week_"+d.toISOString().slice(0,10);
+  // Use local date components instead of toISOString() which uses UTC
+  const y=d.getFullYear();
+  const mo=String(d.getMonth()+1).padStart(2,'0');
+  const dy=String(d.getDate()).padStart(2,'0');
+  return "week_"+y+"-"+mo+"-"+dy;
 }
 
 function updateDiag(entryCount){
@@ -509,6 +518,7 @@ function updateDiag(entryCount){
     const pad=n=>String(n).padStart(2,'0');
     document.getElementById('diagSaved').textContent=`Saved: ${pad(h)}:${pad(m)}:${pad(s)}`;
     document.getElementById('diagEntries').textContent=`Entries: ${entryCount}`;
+    document.getElementById('diagKey').textContent=`Key: ${weekKey()}`;
     document.getElementById('diagOrigin').textContent=window.location.origin+window.location.pathname;
   }catch(e){}
 }
@@ -558,6 +568,7 @@ function load(){
     document.getElementById('diagSaved').textContent=entryCount>0?`Loaded: ${pad(h)}:${pad(m)}:${pad(s)}`:`No data found`;
     document.getElementById('diagSaved').style.color=entryCount>0?'#00e5a0':'#ff4d4d';
     document.getElementById('diagEntries').textContent=`Entries: ${entryCount}`;
+    document.getElementById('diagKey').textContent=`Key: ${key}`;
     document.getElementById('diagOrigin').textContent=window.location.origin+window.location.pathname;
   }catch(e){}
   // Restore sat visibility
@@ -591,10 +602,13 @@ function exportCSV(){
   rows.push(totalRow.join(","));
   let d=new Date();
   d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
+  const ey=d.getFullYear();
+  const emo=String(d.getMonth()+1).padStart(2,'0');
+  const edy=String(d.getDate()).padStart(2,'0');
   const blob=new Blob([rows.join("\n")],{type:"text/csv"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download=`timecard_${d.toISOString().slice(0,10)}.csv`;
+  a.download=`timecard_${ey}-${emo}-${edy}.csv`;
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(a.href); },100);
 }
