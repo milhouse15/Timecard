@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Timecard Pro+</title>
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFVElEQVR4nO3d2XHcShBE0abiWQE/6BwNoHP0g25IHxRDIN4Mtt6qMu/5lYLCcllqALO8LMvyuwAifs3eAKAlgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoYUgoaU/2ZvQBafH++7f768vg3aEuwh6EaeBU/oYxF0Z4Q+1gsfBXbsaLnREqHXYUIHw0SvQ9BJEPo5BF1hG9PIpcn23yTsLwTd0LOoRoT++fFO1IWLwkN7MdYG1CN096iZ0BP1mOjuk5qgG2q1np25dMmOJceBK3cXRj4e51H8Y0zogVreelte33ajdl16MKF3XL0gbL0kOBMkk/onJnQjPda3j37mNtCjSe2G10OLc4udJceOmjVvr5Du3gFxWXqw5Ohk9K03LhK/EPQT0Sbs2Z/ttsTYIuggWoW+F7XDlCbo4NQDbI27HBdlDizztp/FhK7EC+9jIegHWlxYzQqdi0LcdiceJnpfBB0EobdB0BfMiKtV6C6/GNzlqDAzks+Pd/v18iNM6I07DzJa/Jw7IrzrPBqC7oS3Uc1B0IPtLVNGv35EEUGfNCIKpno9gk7AacLWIuiVs5Nw/feixMYU/0LQlXggEgtBdxIldLdfLII+YdQHxLjF1wNBBxJlqmdG0H9FvqjabhtPCJ8j6BsIKi6CbiDqAxHHpYpk0C1DqoliduiOa3KZoGdPwytqQm8RY8QHQ62kDzpTyEfuvHCpdv/VvnQo9Qv8lWI+sry+dY1O5VimDVrlBESicEzTBj2Cyn/DTlKuoVt/dKzCZNq6+0aC7J9/l25CE/M/d7f96BhlPibpgt6TebKMpnqsUn2Cf+0r1TJPnjtqJ3HG6NNM6Fb3W53UBpvxmKUJeo/iiWlFcQrvSR+02gmZQekYpgi6dsIqnbCr3PY9RdAtuJ3YUtq/kCmDlA9W7nKM2o3NhIYHgoYUgoYUgoYUgoYUq7scvXCfPA6Cvqnl/VnlN62ORtAXjHjIQNx1CPqEWU/L1N6RPQJB74jy2Jewz+MuxxNRYl6LuE3REPRG9C+0jLxtERD0SpZYov/SzUTQf/X8jsBea1+i/j+CLn3C2IbcK2yi/sk+aIUgFPahFeuglUJQ2pca1kFDj23QihNNcZ+usgxa+cQr79sZlkFDl13QDhPMYR+fsQsa2qyCdppcTvu6ZhU09NkE7Tqx3NgE7cjxl5igIYWgIYWgIcXiTbKjvhQ+ouzfO3iVRdB7nE62A5YckELQkELQkGIf9MiHD44POkazvygsRTs0t4teiwntdlKdWQQNHwQNKQQNKTZBO66jHffZJmh4IGhIsQra6b9gp31dswoa+uyCdphcDvv4jF3Q6pxjLsU0aPeTrswy6FI0o1bcp6tsgy5FKwClfalhHXQpGiEo7EMr9kFnR8w/EXTp+12CPWXc5t4IeiVTIJm2dSSC3sgQSoZtnIWgH4gcTORti4A3yT7xHU6UN9AS8jkEfWB22IR8DUGfNDpsQr6HoC9ah9Y6biKuR9AVtgFeDZyA2yPohhQDzbZPKW7bZTuomCdF0Hui3FZDDOmDRj2loZAm6L1lh9IJGW3v2GVc6slcFK5PTMYTMZLyAHhZluX37I24QvlkRJJ1KKRZcnzLeqAzyXyM0wVdSu4DHl32Y5sy6FLyH/iIFI5pujX0I6yr6yiE/E0iaOBb2iUH8AhBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQwpBQ8ofh5HmIsDVvzQAAAAASUVORK5CYII=">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mono:'Outfit',sans-serif;
+  --sans:'Outfit',sans-serif;
+}
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body{
+  font-family:'Outfit',sans-serif;
+  margin:0;
+  background:#0f0f0f;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  min-height:100vh;
+  padding:16px 0 32px;
+}
+.app-frame{
+  max-width:500px;
+  width:96%;
+  background:#1a1a1a;
+  border-radius:20px;
+  border:1px solid #444;
+  box-shadow:0 24px 64px rgba(0,0,0,.7);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.top-bar{
+  background:#1a1a1a;
+  border-bottom:1px solid #444;
+  padding:18px 18px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+.top-bar-left{ display:flex; flex-direction:column; gap:3px; }
+.app-title{
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:#00e5a0;
+}
+#weekLabel{
+  font-size:18px;
+  font-weight:700;
+  color:#e8e8e8;
+  letter-spacing:-0.02em;
+}
+.nav-row{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  margin-top:10px;
+}
+.nav-btn{
+  background:#242424;
+  border:1px solid #444;
+  color:#888;
+  border-radius:8px;
+  padding:5px 12px;
+  font-size:13px;
+  font-family:'Outfit',sans-serif;
+  font-weight:500;
+  cursor:pointer;
+}
+.nav-btn:active{ background:#2e2e2e; color:#f0f0f0; }
+.export-btn{
+  background:transparent;
+  border:1px solid #444;
+  color:#888;
+  border-radius:8px;
+  padding:6px 14px;
+  font-size:13px;
+  font-family:'Outfit',sans-serif;
+  font-weight:500;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.export-btn:active{ border-color:#00e5a0; color:#00e5a0; }
+.sat-col{ transition:all 0.2s; }
+.sat-hidden .sat-col{ display:none; }
+.sat-btn{
+  background:#242424;
+  border:1px solid #444;
+  color:#888;
+  border-radius:8px;
+  padding:5px 10px;
+  font-size:13px;
+  font-family:'Outfit',sans-serif;
+  font-weight:500;
+  cursor:pointer;
+}
+.sat-btn.active{ border-color:#00e5a0; color:#00e5a0; background:rgba(0,229,160,0.12); }
+#diagBar{
+  background:#1f1f1f;
+  border-bottom:1px solid #333;
+  padding:5px 18px;
+  font-size:10px;
+  font-family:monospace;
+  color:#666;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.diag-row{ display:flex; justify-content:space-between; }
+.container{
+  padding:12px 14px;
+  overflow-x:auto;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+th{
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:#d0d0d0;
+  padding:6px 2px;
+  border-bottom:1px solid #444;
+  text-align:center;
+}
+td{
+  border-bottom:1px solid #333;
+  padding:2px 1px;
+  text-align:center;
+}
+td:first-child{
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#666;
+  width:26px;
+}
+tr:nth-child(4n+1) td, tr:nth-child(4n+2) td{
+  background:rgba(255,255,255,0.015);
+}
+input{
+  border:none;
+  width:95%;
+  text-align:center;
+  font-size:16px;
+  font-family:'Outfit',sans-serif;
+  font-weight:400;
+  background:transparent;
+  border-radius:5px;
+  padding:4px 1px;
+  color:#f0f0f0;
+  transition:background 0.15s;
+  -webkit-appearance:none;
+}
+input:focus{
+  background:rgba(0,229,160,0.12);
+  outline:none;
+  color:#00e5a0;
+}
+.total{
+  font-size:11px;
+  font-weight:500;
+  color:#00e5a0;
+  background:#242424 !important;
+  border-top:1px solid #444 !important;
+  padding:4px 2px !important;
+}
+.bar{
+  height:2px;
+  background:#00e5a0;
+  border-radius:2px;
+  margin-top:3px;
+  opacity:0.5;
+}
+.weekTotalRow td{
+  background:#242424 !important;
+  border-top:1px solid #00e5a0 !important;
+  padding:10px 8px !important;
+}
+.week-total-label{
+  font-size:9px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:#888;
+  text-align:left;
+  padding-left:8px !important;
+}
+.weekTotal{
+  font-weight:500;
+  font-size:22px;
+  color:#00e5a0;
+  text-align:right;
+  padding-right:8px !important;
+}
+.weekTotal.over{ color:#ff4d4d; }
+.add-row td{
+  padding:4px 2px !important;
+  border-bottom:none !important;
+  background:transparent !important;
+}
+button.addEntry{
+  background:transparent;
+  color:#555;
+  border:1px dashed #555;
+  border-radius:5px;
+  padding:1px 6px;
+  font-size:14px;
+  cursor:pointer;
+  line-height:1.4;
+  font-family:'Outfit',sans-serif;
+}
+button.addEntry:active{ border-color:#00e5a0; color:#00e5a0; }
+.bottom-buttons{
+  padding:12px 14px 16px;
+  border-top:1px solid #444;
+}
+button.clock{
+  background:#00e5a0;
+  color:#000;
+  font-size:15px;
+  font-family:'Outfit',sans-serif;
+  font-weight:700;
+  letter-spacing:0.02em;
+  border-radius:12px;
+  width:100%;
+  padding:14px;
+  border:none;
+  cursor:pointer;
+}
+button.clock:active{ opacity:0.85; }
+
+/* Custom keyboard toolbar */
+#kbd-toolbar{
+  position:fixed;
+  bottom:-60px;
+  left:0; right:0;
+  height:44px;
+  background:#2a2a2a;
+  border-top:1px solid #555;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:0 12px;
+  gap:8px;
+  z-index:9999;
+  transition:bottom 0.2s;
+}
+#kbd-toolbar.visible{ bottom:0; }
+#kbd-toolbar button{
+  background:#3a3a3a;
+  border:1px solid #666;
+  color:#e8e8e8;
+  border-radius:7px;
+  padding:5px 16px;
+  font-size:15px;
+  font-family:'Outfit',sans-serif;
+  font-weight:600;
+  cursor:pointer;
+  -webkit-appearance:none;
+}
+#kbd-toolbar button:active{ background:#555; }
+</style>
+</head>
+<body>
+
+<div class="app-frame">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="app-title">Timecard</div>
+      <div id="weekLabel">Week of --/--/----</div>
+      <div class="nav-row">
+        <button class="nav-btn" onclick="changeWeek(-1)">← Prev</button>
+        <button class="nav-btn" onclick="changeWeek(1)">Next →</button>
+        <button class="sat-btn" id="satBtn" onclick="toggleSat()">Sat</button>
+      </div>
+    </div>
+    <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+  </div>
+
+  <div id="diagBar">
+    <div class="diag-row">
+      <span id="diagSaved">Last saved: —</span>
+      <span id="diagEntries">Entries: —</span>
+    </div>
+    <div class="diag-row">
+      <span id="diagKey" style="color:#555;">Key: —</span>
+      <span id="diagOrigin" style="color:#444;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;"></span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="slide-wrapper">
+      <table id="table" class="sat-hidden">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th class="sat-col">Sat</th>
+          </tr>
+        </thead>
+        <tbody id="body"></tbody>
+        <tfoot>
+          <tr class="add-row">
+            <td></td>
+            <td><button class="addEntry" onclick="addEntry(0)">+</button></td>
+            <td><button class="addEntry" onclick="addEntry(1)">+</button></td>
+            <td><button class="addEntry" onclick="addEntry(2)">+</button></td>
+            <td><button class="addEntry" onclick="addEntry(3)">+</button></td>
+            <td><button class="addEntry" onclick="addEntry(4)">+</button></td>
+            <td class="sat-col"><button class="addEntry" onclick="addEntry(5)">+</button></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td class="total" id="t0"></td>
+            <td class="total" id="t1"></td>
+            <td class="total" id="t2"></td>
+            <td class="total" id="t3"></td>
+            <td class="total" id="t4"></td>
+            <td class="total sat-col" id="t5"></td>
+          </tr>
+          <tr class="weekTotalRow">
+            <td colspan="4" class="week-total-label">Week Total</td>
+            <td colspan="2" class="weekTotal" id="weekTotal"></td>
+            <td class="sat-col"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="bottom-buttons">
+    <button class="clock" onclick="clockAuto()">Clock In / Out</button>
+  </div>
+</div>
+
+<div id="kbd-toolbar">
+  <button onmousedown="event.preventDefault(); moveColDir(-1)">▲ Up</button>
+  <button onmousedown="event.preventDefault(); moveColDir(1)">▼ Down</button>
+  <button onmousedown="event.preventDefault(); doneEditing()">Done</button>
+</div>
+
+<script>
+const days=6;
+let weekOffset=0, initialRows=6;
+let dynamicCounts={};
+let activeInput=null;
+let lastCol=null;
+let lastColIdx=null;
+let suppressRedirect=false;
+
+function showToolbar(input){
+  activeInput=input;
+  document.getElementById('kbd-toolbar').classList.add('visible');
+}
+function hideToolbar(){
+  activeInput=null;
+  document.getElementById('kbd-toolbar').classList.remove('visible');
+}
+function moveColDir(dir){
+  if(!activeInput) return;
+  const col=activeInput.dataset.d;
+  const all=Array.from(document.querySelectorAll('input[data-d="'+col+'"]'));
+  const idx=all.indexOf(activeInput);
+  const next=all[idx+dir];
+  if(next){ suppressRedirect=true; next.focus(); }
+}
+function doneEditing(){
+  if(activeInput) activeInput.blur();
+  hideToolbar();
+}
+
+function handleFocus(input){
+  const col=input.dataset.d;
+  const all=Array.from(document.querySelectorAll('input[data-d="'+col+'"]'));
+  const idx=all.indexOf(input);
+
+  if(!suppressRedirect && lastCol!==null && col!==lastCol){
+    // iOS moved us sideways — redirect back down the last column
+    const lastColInputs=Array.from(document.querySelectorAll('input[data-d="'+lastCol+'"]'));
+    const nextIdx=lastColIdx+1;
+    if(nextIdx<lastColInputs.length){
+      suppressRedirect=true;
+      lastColInputs[nextIdx].focus();
+      return;
+    }
+  }
+  suppressRedirect=false;
+  lastCol=col;
+  lastColIdx=idx;
+  setTimeout(function(){ input.select(); },0);
+  showToolbar(input);
+}
+
+// ── Input factory ──────────────────────────────────────────────────────────
+
+function makeInput(r,d){
+  const input=document.createElement('input');
+  input.type='text';
+  input.inputMode='numeric';
+  input.pattern='[0-9]*';
+  input.tabIndex=-1;
+  input.dataset.r=String(r);
+  input.dataset.d=String(d);
+  input.addEventListener('focus',function(){ handleFocus(input); });
+  input.addEventListener('blur',function(){ autoFormat(input); setTimeout(function(){ if(activeInput===input) hideToolbar(); },200); });
+  input.addEventListener('change',function(){ save(); calc(); });
+  return input;
+}
+
+// ── Table build ────────────────────────────────────────────────────────────
+
+function buildTable(){
+  const body=document.getElementById('body');
+  body.innerHTML='';
+  for(let r=0;r<initialRows;r++){
+    const tr=document.createElement('tr');
+    const label=document.createElement('td');
+    label.innerText=r%2===0?'In':'Out';
+    tr.appendChild(label);
+    for(let d=0;d<days;d++){
+      const td=document.createElement('td');
+      if(d===5) td.classList.add('sat-col');
+      td.appendChild(makeInput(r,d));
+      tr.appendChild(td);
+    }
+    body.appendChild(tr);
+  }
+}
+
+function getDynamicCounts(){
+  const key=weekKey();
+  if(!dynamicCounts[key]) dynamicCounts[key]=Array(days).fill(0);
+  return dynamicCounts[key];
+}
+
+function createDynamicPair(day,suppressSave){
+  const tbody=document.getElementById('body');
+  const inRow=document.createElement('tr');
+  const outRow=document.createElement('tr');
+  inRow.dataset.dynamic=String(day);
+  outRow.dataset.dynamic=String(day);
+  const inLabel=document.createElement('td'); inLabel.innerText='In'; inRow.appendChild(inLabel);
+  const outLabel=document.createElement('td'); outLabel.innerText='Out'; outRow.appendChild(outLabel);
+  for(let d=0;d<days;d++){
+    const inCell=document.createElement('td');
+    const outCell=document.createElement('td');
+    if(d===5){ inCell.classList.add('sat-col'); outCell.classList.add('sat-col'); }
+    if(d===day){
+      inCell.appendChild(makeInput('dyn',d));
+      outCell.appendChild(makeInput('dyn',d));
+    }
+    inRow.appendChild(inCell);
+    outRow.appendChild(outCell);
+  }
+  tbody.appendChild(inRow);
+  tbody.appendChild(outRow);
+  if(!suppressSave){ getDynamicCounts()[day]++; save(); }
+}
+
+function addEntry(day){ createDynamicPair(day,false); }
+
+// ── Time helpers ───────────────────────────────────────────────────────────
+
+function parseTimeWithContext(v,prev){
+  if(prev===undefined) prev=null;
+  if(!v) return null;
+  v=v.toLowerCase().replace(/\s/g,'');
+  let h,m,explicitAmPm=null;
+
+  // Strip and note am/pm/a/p suffix
+  const ampmMatch=v.match(/(am|pm|a|p)$/);
+  if(ampmMatch){
+    explicitAmPm=ampmMatch[1];
+    v=v.slice(0,v.length-ampmMatch[1].length);
+  }
+
+  // Parse digits
+  if(/^\d{3,4}$/.test(v)){
+    h=parseInt(v.slice(0,-2),10);
+    m=parseInt(v.slice(-2),10);
+  } else if(/^\d{1,2}:\d{2}$/.test(v)){
+    const parts=v.split(':');
+    h=parseInt(parts[0],10); m=parseInt(parts[1],10);
+  } else if(/^\d{1,2}$/.test(v)){
+    h=parseInt(v,10); m=0;
+  } else {
+    return null;
+  }
+
+  if(isNaN(h)||isNaN(m)||m>59) return null;
+
+  let minutes=h*60+m;
+
+  if(explicitAmPm){
+    if((explicitAmPm==='pm'||explicitAmPm==='p')&&h!==12) minutes+=(12*60)-h*60+h*60;
+    // Recalc cleanly
+    if((explicitAmPm==='pm'||explicitAmPm==='p')&&h!==12) minutes=((h+12)*60+m);
+    else if((explicitAmPm==='am'||explicitAmPm==='a')&&h===12) minutes=m;
+    else minutes=h*60+m;
+  } else {
+    // No explicit am/pm — use context to guess
+    if(prev!==null&&minutes<=prev) minutes+=12*60;
+    // If no context and hour is 1-6, assume PM for typical work hours
+    else if(prev===null&&h>=1&&h<=6) minutes+=12*60;
+  }
+
+  return Math.round(minutes/15)*15;
+}
+
+function formatTime(minutes){
+  minutes=minutes%(24*60);
+  let h=Math.floor(minutes/60),m=minutes%60;
+  const ampm=h>=12?'p':'a';
+  h=h%12; if(h===0) h=12;
+  return h+':'+(m<10?'0':'')+m+ampm;
+}
+
+function autoFormat(input){
+  let prev=null;
+  const colInputs=Array.from(document.querySelectorAll('input[data-d="'+input.dataset.d+'"]'));
+  for(let i=0;i<colInputs.length;i++){
+    if(colInputs[i]===input) break;
+    const t=parseTimeWithContext(colInputs[i].value,prev);
+    if(t!==null) prev=t;
+  }
+  const t=parseTimeWithContext(input.value,prev);
+  if(t!==null) input.value=formatTime(t);
+  calc();
+}
+
+// ── Calc ───────────────────────────────────────────────────────────────────
+
+function calc(){
+  let week=0;
+  for(let d=0;d<days;d++){
+    let total=0,prev=null;
+    const inputs=document.querySelectorAll('input[data-d="'+d+'"]');
+    for(let i=0;i<inputs.length;i+=2){
+      const t1=parseTimeWithContext(inputs[i]?inputs[i].value:'',prev);
+      if(t1!==null) prev=t1;
+      const t2=parseTimeWithContext(inputs[i+1]?inputs[i+1].value:'',t1);
+      if(t2!==null) prev=t2;
+      if(t1!==null&&t2!==null) total+=t2-t1;
+    }
+    const hrs=total/60; week+=hrs;
+    document.getElementById('t'+d).innerHTML=hrs>0
+      ? hrs.toFixed(2)+'<div class="bar" style="width:'+Math.min(hrs/12*100,100)+'%"></div>'
+      : '';
+  }
+  const wEl=document.getElementById('weekTotal');
+  wEl.innerText=week>0?week.toFixed(2)+'h':'—';
+  wEl.className='weekTotal'+(week>40?' over':'');
+}
+
+// ── Clock in/out ───────────────────────────────────────────────────────────
+
+function clockAuto(){
+  const day=(new Date().getDay()+6)%7;
+  if(day>5) return;
+  const inputs=document.querySelectorAll('input[data-d="'+day+'"]');
+  for(let i=0;i<inputs.length;i++){
+    if(!inputs[i].value){
+      if(i===inputs.length-1) addEntry(day);
+      const now=new Date();
+      let minutes=Math.round((now.getHours()*60+now.getMinutes())/15)*15;
+      let h=Math.floor(minutes/60),m=minutes%60;
+      const ampm=h>=12?'p':'a'; h=h%12; if(h===0) h=12;
+      inputs[i].value=h+':'+(m<10?'0':'')+m+ampm;
+      break;
+    }
+  }
+  save(); calc();
+}
+
+// ── Week key ───────────────────────────────────────────────────────────────
+
+function weekKey(){
+  const d=new Date();
+  d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
+  const y=d.getFullYear();
+  const mo=String(d.getMonth()+1).padStart(2,'0');
+  const dy=String(d.getDate()).padStart(2,'0');
+  return 'week_'+y+'-'+mo+'-'+dy;
+}
+
+// ── Storage ────────────────────────────────────────────────────────────────
+
+function getAllData(){
+  try{ const r=localStorage.getItem('tc_alldata'); if(r) return JSON.parse(r); }catch(e){}
+  return {};
+}
+function setAllData(data){
+  try{ localStorage.setItem('tc_alldata',JSON.stringify(data)); }catch(e){}
+}
+
+function save(){
+  const allData=getAllData();
+  const key=weekKey();
+  allData[key+'_structure']=getDynamicCounts();
+  const data=[];
+  document.querySelectorAll('input').forEach(function(i){ data.push(i.value); });
+  const hasEntries=data.some(function(v){ return !!v; });
+  const existingHasEntries=allData[key]&&allData[key].some(function(v){ return !!v; });
+  if(hasEntries||!existingHasEntries){
+    allData[key]=data;
+    setAllData(allData);
+  }
+  updateDiag(data.filter(function(v){ return !!v; }).length);
+}
+
+// ── Diagnostics ────────────────────────────────────────────────────────────
+
+function updateDiag(entryCount){
+  try{
+    const now=new Date();
+    const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+    const pad=function(n){ return String(n).padStart(2,'0'); };
+    document.getElementById('diagSaved').textContent='Saved: '+pad(h)+':'+pad(m)+':'+pad(s);
+    document.getElementById('diagEntries').textContent='Entries: '+entryCount;
+    document.getElementById('diagKey').textContent='Key: '+weekKey();
+    document.getElementById('diagOrigin').textContent=window.location.origin+window.location.pathname;
+  }catch(e){}
+}
+
+// ── Sat toggle ─────────────────────────────────────────────────────────────
+
+let satVisible=false;
+function toggleSat(){
+  satVisible=!satVisible;
+  document.getElementById('table').classList.toggle('sat-hidden',!satVisible);
+  document.getElementById('satBtn').classList.toggle('active',satVisible);
+  try{ localStorage.setItem('tc_sat',satVisible?'1':'0'); }catch(e){}
+}
+
+// ── Load ───────────────────────────────────────────────────────────────────
+
+function load(){
+  buildTable();
+  const allData=getAllData();
+  const key=weekKey();
+  const savedCounts=allData[key+'_structure']||null;
+  if(savedCounts){
+    dynamicCounts[key]=savedCounts;
+    for(let d=0;d<days;d++)
+      for(let i=0;i<savedCounts[d];i++)
+        createDynamicPair(d,true);
+  } else {
+    dynamicCounts[key]=Array(days).fill(0);
+  }
+  const saved=allData[key]||[];
+  const inputs=document.querySelectorAll('input');
+  inputs.forEach(function(inp,idx){ if(saved[idx]!==undefined) inp.value=saved[idx]; });
+  updateWeekLabel();
+  calc();
+  try{
+    const now=new Date();
+    const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+    const pad=function(n){ return String(n).padStart(2,'0'); };
+    const entryCount=saved.filter(function(v){ return !!v; }).length;
+    document.getElementById('diagSaved').textContent=entryCount>0?'Loaded: '+pad(h)+':'+pad(m)+':'+pad(s):'No data found';
+    document.getElementById('diagSaved').style.color=entryCount>0?'#00e5a0':'#ff4d4d';
+    document.getElementById('diagEntries').textContent='Entries: '+entryCount;
+    document.getElementById('diagKey').textContent='Key: '+key;
+    document.getElementById('diagOrigin').textContent=window.location.origin+window.location.pathname;
+  }catch(e){}
+  try{
+    const sv=localStorage.getItem('tc_sat');
+    satVisible=sv==='1';
+  }catch(e){ satVisible=false; }
+  document.getElementById('table').classList.toggle('sat-hidden',!satVisible);
+  document.getElementById('satBtn').classList.toggle('active',satVisible);
+}
+
+function changeWeek(dir){ weekOffset+=dir; load(); }
+
+function updateWeekLabel(){
+  const d=new Date();
+  d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('weekLabel').innerText=months[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+}
+
+// ── Export CSV ─────────────────────────────────────────────────────────────
+
+function exportCSV(){
+  const rows=[];
+  document.querySelectorAll('#body tr').forEach(function(tr){
+    const row=[];
+    tr.querySelectorAll('td').forEach(function(td){
+      const input=td.querySelector('input');
+      row.push(input?input.value:td.innerText);
+    });
+    rows.push(row.join(','));
+  });
+  const totalRow=['Total'];
+  for(let d=0;d<6;d++) totalRow.push(document.getElementById('t'+d).innerText.replace(/\n.*/,''));
+  rows.push(totalRow.join(','));
+  const d=new Date();
+  d.setDate(d.getDate()-(d.getDay()+6)%7+weekOffset*7);
+  const y=d.getFullYear();
+  const mo=String(d.getMonth()+1).padStart(2,'0');
+  const dy=String(d.getDate()).padStart(2,'0');
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='timecard_'+y+'-'+mo+'-'+dy+'.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(a.href); },100);
+}
+
+// ── Swipe ──────────────────────────────────────────────────────────────────
+
+let startX=null;
+document.addEventListener('touchstart',function(e){ startX=e.touches[0].clientX; },{passive:true});
+document.addEventListener('touchend',function(e){
+  const dx=e.changedTouches[0].clientX-startX;
+  if(dx>80){ weekOffset--; load(); }
+  if(dx<-80){ weekOffset++; load(); }
+});
+
+// ── Resume from background ────────────────────────────────────────────────
+
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible') load();
+});
+window.addEventListener('pageshow',function(e){
+  if(e.persisted) load();
+});
+
+load();
+</script>
+</body>
+</html>
